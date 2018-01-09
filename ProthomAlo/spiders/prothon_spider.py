@@ -21,16 +21,27 @@ class QuotesSpider(scrapy.Spider):
         # res = response.css('.listing div a.link_overlay').extract()
         # print res
         count = 0
+        c2 = 0
         for i in response.css('.listing div a.link_overlay::attr(href)').extract():
             # yield {
             #     'link': 'http://www.prothomalo.com'
             # }
             # print 'http://www.prothomalo.com' + i
             url = 'http://www.prothomalo.com' + i
+            # yield {
+            #         'link': 'http://www.prothomalo.com'+str(i)
+            #     }
+
             yield scrapy.Request(url=url, callback=self.parse_inner)
             count +=1
-        # print count
 
+            next_page = response.css('a.next_page::attr(href)').extract_first()
+            if next_page is not None:
+                next_page = response.urljoin(next_page)
+                yield scrapy.Request(next_page, callback=self.parse)
+                c2 +=1
+        print count
+        print c2
     def parse_inner(self,response):
         # print "I am here"
         # innercon = response.css('article div p::text').extract()
@@ -46,3 +57,5 @@ class QuotesSpider(scrapy.Spider):
         #     if next_page is not None:
         #         next_page = response.urljoin(next_page)
         #         yield scrapy.Request(next_page, callback=self.parse)
+
+# scrapy crawl quotes
