@@ -23,9 +23,13 @@ class QuotesSpider(scrapy.Spider):
                 next_page = response.urljoin(next_page)
                 yield scrapy.Request(next_page, callback=self.parse)
     def parse_inner(self,response):
-        for i in response.css('article div p::text').extract():
+        # for i in response.css('article div p::text').extract():
+        for i in response.css('.content_detail').extract():
+            title = response.css('.right_title h1::text').extract()
+            text = response.css('article div p::text').extract()
             yield {
-                'text': i
+                'title':title,
+                'text': text
             }
 
 
@@ -33,3 +37,4 @@ class QuotesSpider(scrapy.Spider):
 # scrapy crawl quotes
 # for write in json format
 #scrapy crawl quotes -o quotes.json
+# scrapy crawl <spider name> -o file.csv -t csv
